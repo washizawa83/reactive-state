@@ -1,18 +1,28 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { navigate } from "svelte-routing";
     import { SvelteUIProvider, Notification } from '@svelteuidev/core';
     import { Check, Cross2 } from 'radix-icons-svelte';
     import Sidebar from "../components/sidebar/Sidebar.svelte";
 	import { QuerySnapshot, collection, onSnapshot, query } from 'firebase/firestore';
-    import { fireStore } from "../service/firebase";
+    import { auth, createUser, fireStore } from "../service/firebase";
     import { userModelsStore, currentUserModelStore } from "../store/userStateStore";
     import type { UserModel } from "../models/user";
     import DashBoard from "./DashBoard.svelte";
     import { notificationStore } from "../store/appStore";
+    import { onAuthStateChanged } from "firebase/auth";
 
     let notificationVisible = false
+    let loginUser: any
 
     onMount(() => {
+        onAuthStateChanged(auth, user => {
+            loginUser = user
+            if (!loginUser) {
+                navigate("/", { replace: true });
+            }
+        });
+
         onSnapshot(
             query(collection(fireStore, "users")),
             (snapshot: QuerySnapshot): void => {
@@ -27,8 +37,27 @@
                         states: data.states
                     }
                 })
-                $currentUserModelStore = users.find((user) => user.id === 'whEEB3nwGw4Ms4SANCDi')!
-                userModelsStore.set(users)
+                const user = users.find((user) => user.id === loginUser.uid)
+                if (user) {
+                    $currentUserModelStore = user
+                    userModelsStore.set(users)
+                } else {
+                    createUser(
+                        loginUser.uid,
+                        {
+                            icon: loginUser.photoURL,
+                            name: loginUser.displayName,
+                            side_note: '',
+                            state_id: 0,
+                            states: {
+                                0: {
+                                    state: '😁',
+                                    description: 'welcome!'
+                                }
+                            }
+                        }
+                    )
+                }
             }
         )
     })
@@ -62,11 +91,13 @@
 <style lang="ts">
     main {
         width: 100vw;
+        height: 100%;
         display: flex;
         position: relative;
         & .sidebar {
             width: 8%;
-            height: 100vh;
+            max-height: 100%;
+            min-height: 100vh;
         }
         & .main-content {
             width: 92%;
@@ -74,7 +105,8 @@
         }
         & .notification {
             position: absolute;
-            bottom: 0;
+            bottom: 20px;
+            right: 20px;
         }
     }
 </style>

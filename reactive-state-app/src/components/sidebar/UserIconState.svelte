@@ -8,7 +8,7 @@
 
 <div class="user">
     <div class="user-icon">
-        <img src={userModel.icon} alt="">
+        <img class=user-icon-image src={userModel.icon} alt="">
     </div>
     <Tooltip
         color="indigo"
@@ -32,6 +32,7 @@
             img {
                 width: 35px;
                 border-radius: 50%;
+                margin-right: 4px;
             }
         }
         &-state {

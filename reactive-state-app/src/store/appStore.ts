@@ -8,3 +8,5 @@ export type ShowNotification = {
 export type NotificationType = 'success' | 'error'
 
 export const notificationStore = writable<ShowNotification>()
+
+export const topPageStateId = writable<number>(1)

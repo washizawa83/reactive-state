@@ -10,7 +10,7 @@
 <section class="dashboard">
     <section class="state-pad">
         {#if $currentUserModelStore}
-            <StatePadList userStates={currentUserModel.states} />
+            <StatePadList />
         {/if}
     </section>
     <section class="state-form">

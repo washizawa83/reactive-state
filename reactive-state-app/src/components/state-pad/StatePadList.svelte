@@ -2,17 +2,25 @@
 	import type { UserState } from "../../models/user";
     import StatePad from '../state-pad/StatePad.svelte'
     import { currentUserModelStore } from "../../store/userStateStore";
-
-    export let userStates: UserState
+    
+    export let userStates: UserState | undefined = undefined
 </script>
 
 <div class="state-pad-list">
-    {#each Object.entries($currentUserModelStore.states) as state}
-        <StatePad
-            userState={{id: parseInt(state[0]), state: state[1]}}
+    {#if !userStates}
+        {#each Object.entries($currentUserModelStore.states) as state}
+            <StatePad
+                userState={{id: parseInt(state[0]), state: state[1]}}
+             />
+        {/each}
+        <StatePad />
+    {:else}
+        {#each Object.entries(userStates) as state}
+            <StatePad
+                userState={{id: parseInt(state[0]), state: state[1]}}
             />
-    {/each}
-    <StatePad />
+        {/each}
+    {/if}
 </div>
 
 <style lang="scss">

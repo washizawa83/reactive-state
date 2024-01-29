@@ -1,6 +1,11 @@
 <script lang="ts">
-    import StatePadList from "../components/state-pad/StatePadList.svelte";
     import type { UserState } from "../models/user";
+    import { topPageStateId } from "../store/appStore";
+    import TopPageStatePadList from "../components/state-pad/TopPageStatePadList.svelte";
+    import { onMount } from "svelte";
+    import { navigate } from "svelte-routing";
+    import { onAuthStateChanged } from "firebase/auth";
+    import { auth } from "../service/firebase";
 
     const topStates: UserState = {
         1: {
@@ -39,11 +44,15 @@
             state: '🔑',
             description: 'login'
         },
-        10: {
-            state: '🛎',
-            description: 'signin'
-        }
     }
+
+    onMount(() => {
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                navigate("/app", { replace: true });
+            }
+        });
+    })
 </script>
 
 <div class="top">
@@ -52,10 +61,10 @@
     </h1>
     <section class="state">
         <div class="your-state">
-            <h2 class="your-state-icon">😃</h2>
+            <h2 class="your-state-icon">{topStates[$topPageStateId].state}</h2>
         </div>
         <div class="state-pad">
-            <StatePadList userStates={topStates} />
+            <TopPageStatePadList userStates={topStates} />
         </div>
     </section>
 </div>

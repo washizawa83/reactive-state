@@ -1,19 +1,27 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, updateDoc, addDoc, collection, doc } from "firebase/firestore";
+import { getFirestore, updateDoc, setDoc, doc } from "firebase/firestore";
 import { notificationStore } from "../store/appStore";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBhbr_Id6v4R-5ZnGES5GKBudKtjjUgLDg",
-    authDomain: "reactive-state.firebaseapp.com",
-    projectId: "reactive-state",
-    storageBucket: "reactive-state.appspot.com",
-    messagingSenderId: "945316273467",
-    appId: "1:945316273467:web:c8aea4254b67414ee86b1e",
-    measurementId: "G-WDBQ950EGR"
+    apiKey: import.meta.env.VITE_API_KEY,
+    authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_APP_ID,
+    measurementId: import.meta.env.VITE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
 export const fireStore = getFirestore(app);
+export const provider = new GoogleAuthProvider()
+export const auth = getAuth(app);
+
+export const createUser = async(userId, data) => {
+    await setDoc(doc(fireStore, "users", userId), data);
+}
 
 export const updateCurrentState = async(userId, stateId) => {
     await updateDoc(doc(fireStore, 'users', userId), {state_id: stateId})
